@@ -366,7 +366,7 @@ DIOPI_API diopiError_t diopiLogSoftmaxBackward(diopiContextHandle_t ctx, diopiTe
     xdnn_pytorch::Tensor _grad_input = impl::kunlunxin::build_xtorch_tensor(grad_input);
     xdnn_pytorch::Tensor _grad_output = impl::kunlunxin::build_xtorch_tensor(grad_output);
     xdnn_pytorch::Tensor _output = impl::kunlunxin::build_xtorch_tensor(output);
-    // xdnn_pytorch::Sca:wqlarType _input_dtype = impl::kunlunxin::get_xtorch_type(input_dtype);
+    // xdnn_pytorch::ScalarType _input_dtype = impl::kunlunxin::get_xtorch_type(input_dtype);
     xdnn_pytorch::ScalarType _input_dtype = xdnn_pytorch::ScalarType::kfloat32;
 
     DIOPI_CALL_XDNN(xdnn_pytorch::_log_softmax_backward_data(ctx_xpu, _grad_output, _output, dim, _input_dtype, _grad_input));
