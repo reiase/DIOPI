@@ -14,6 +14,7 @@
 
 #include "../error.hpp"
 #include "xdnn_pytorch/xdnn_pytorch.h"
+#include "xpu/runtime.h"
 
 namespace impl {
 namespace kunlunxin {
@@ -147,10 +148,8 @@ xdnn_pytorch::ScalarType get_xtorch_type(diopiDtype_t dt) {
         case diopi_dtype_bfloat16:
             return xdnn_pytorch::ScalarType::kbfloat16;
         // TODO:
-        /*
         case diopi_dtype_float64:
             return xdnn_pytorch::ScalarType::kfloat64;
-        */
         default:
             // NOT_SUPPORTED("diopi dytpe");
             printf("NOT SUPPORTED diopi dytpe: %d\n", (int)dt);
@@ -186,8 +185,13 @@ xdnn_pytorch::Tensor build_xtorch_tensor(T tensor) {
         printf("tensor dsize len is %ld\n", dsize.len);
     }
     if (dsize.len == 0) {
-        NOT_SUPPORTED("tensor is empty");
-        return {{0}, {0}, xdnn_pytorch::ScalarType::kfloat32, (void*)nullptr};
+        //NOT_SUPPORTED("tensor is empty");
+        void* xpu_scalar_data = nullptr;
+        int ret = xpu_malloc(&xpu_scalar_data, 1);
+        if (ret != 0) {
+            return {{0}, {0}, xdnn_pytorch::ScalarType::kfloat32, (void*)nullptr};
+        }
+        return {{0}, {0}, xdnn_pytorch::ScalarType::kfloat32, xpu_scalar_data};
     }
 
     void* data = nullptr;
