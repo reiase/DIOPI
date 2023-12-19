@@ -125,7 +125,7 @@ DIOPI_API diopiError_t diopiConvolution2dBackward(diopiContextHandle_t ctx, diop
     xtorch_vec _stride = impl::kunlunxin::build_xtorch_vec(stride);
     xtorch_vec _padding = impl::kunlunxin::build_xtorch_vec(padding);
     xtorch_vec _dilation = impl::kunlunxin::build_xtorch_vec(dilation);
-    //xtorch_vec _output_padding = impl::kunlunxin::build_xtorch_vec(output_padding);
+    // xtorch_vec _output_padding = impl::kunlunxin::build_xtorch_vec(output_padding);
     auto output_mask = std::array<bool, 3>{true, true, true};
     DIOPI_CALL_XDNN(xdnn_pytorch::convolution_backward(ctx_xpu,
                                                        _grad_output,
@@ -362,7 +362,7 @@ DIOPI_API diopiError_t diopiLogSoftmax(diopiContextHandle_t ctx, diopiTensorHand
     xdnn_pytorch::Tensor _out = impl::kunlunxin::build_xtorch_tensor(out);
     xdnn_pytorch::Tensor _input = impl::kunlunxin::build_xtorch_tensor(input);
     // xdnn_pytorch::ScalarType _dtype = impl::kunlunxin::get_xtorch_type(dtype);
-    //  TODO:
+    // TODO:
     xdnn_pytorch::ScalarType _dtype = xdnn_pytorch::ScalarType::kfloat32;
 
     DIOPI_CALL_XDNN(xdnn_pytorch::log_softmax(ctx_xpu, _input, dim, _dtype, _out));
@@ -433,11 +433,11 @@ DIOPI_API diopiError_t diopiMean(diopiContextHandle_t ctx, diopiTensorHandle_t o
     // xdnn_pytorch::ScalarType _dtype = impl::kunlunxin::get_xtorch_type(dtype);
     xdnn_pytorch::ScalarType _dtype = xdnn_pytorch::ScalarType::kfloat32;
     if (dim.len == 0) {
-        //std::cout << "cyliu diopiMean: dim.len == 0" << std::endl;
+        // std::cout << "cyliu diopiMean: dim.len == 0" << std::endl;
         xdnn_pytorch::Tensor _inputTemp = impl::kunlunxin::build_xtorch_tensor(input);
         DIOPI_CALL_XDNN(xdnn_pytorch::mean(ctx_xpu, _input, _dtype, _inputTemp));
     } else {
-        //std::cout << "cyliu diopiMean: dim.len = " << dim.len << std::endl;
+        // std::cout << "cyliu diopiMean: dim.len = " << dim.len << std::endl;
         xtorch_vec _dim = impl::kunlunxin::build_xtorch_vec(dim);
         DIOPI_CALL_XDNN(xdnn_pytorch::mean_dim(ctx_xpu, _input, _dim, false, _dtype, _out));
     }
