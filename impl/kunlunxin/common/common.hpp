@@ -70,16 +70,16 @@ static xdnn::Context* get_raw_context(bool update_context) {
         diopiGetStream(context, &pstream);
         assert(pstream != nullptr);
         tls_raw_ctx_.get()->xpu_stream = (XPUStream)pstream;
-        if (tls_raw_ctx_.get()->dev().type() == xdnn::kXPU1) {
-            std::cout << "running in KunLun1" << std::endl;
-        } else if (tls_raw_ctx_.get()->dev().type() == xdnn::kXPU2) {
-            std::cout << "running in KunLun2" << std::endl;
-        } else if (tls_raw_ctx_.get()->dev().type() == xdnn::kXPU3) {
-            std::cout << "running in KunLun3" << std::endl;
-        } else {
-            std::cout << "running in unknown XPU device: " << static_cast<int>(tls_raw_ctx_.get()->dev().type()) << std::endl;
-        }
-        std::cout << "thread 0x" << std::hex << std::this_thread::get_id() << " set context xpu stream: " << pstream << std::endl;
+        // if (tls_raw_ctx_.get()->dev().type() == xdnn::kXPU1) {
+        //     std::cout << "running in KunLun1" << std::endl;
+        // } else if (tls_raw_ctx_.get()->dev().type() == xdnn::kXPU2) {
+        //     std::cout << "running in KunLun2" << std::endl;
+        // } else if (tls_raw_ctx_.get()->dev().type() == xdnn::kXPU3) {
+        //     std::cout << "running in KunLun3" << std::endl;
+        // } else {
+        //     std::cout << "running in unknown XPU device: " << static_cast<int>(tls_raw_ctx_.get()->dev().type()) << std::endl;
+        // }
+        // std::cout << "thread 0x" << std::hex << std::this_thread::get_id() << " set context xpu stream: " << pstream << std::endl;
     }
     return tls_raw_ctx_.get();
 }
@@ -92,8 +92,8 @@ inline xdnn::Context* set_cur_ctx(diopiContextHandle_t ctx) {
     return get_raw_context(update_context);
 }
 
-// #define DEBUG false
-#define DEBUG true
+#define DEBUG false
+//#define DEBUG true
 
 inline bool isInt(const diopiScalar_t* scalar) { return scalar->stype <= 7; }
 
@@ -168,7 +168,7 @@ xtorch_vec build_xtorch_vec(diopiSize_t size) {
     int64_t length = size.len;
     for (int i = 0; i < length; i++) {
         if (i > 100) throw "bad size";
-        printf("size: %p, %d, data %ld, len: %ld\n", &size, i, size.data[i], size.len);
+        // printf("size: %p, %d, data %ld, len: %ld\n", &size, i, size.data[i], size.len);
         res.push_back(size.data[i]);
     }
     return res;

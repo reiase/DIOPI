@@ -162,7 +162,6 @@ DIOPI_API diopiError_t diopiAddInp(diopiContextHandle_t ctx, diopiTensorHandle_t
 }
 DIOPI_API diopiError_t diopiAddScalar(diopiContextHandle_t ctx, diopiTensorHandle_t out, diopiConstTensorHandle_t input, const diopiScalar_t* other,
                                       const diopiScalar_t* alpha) {
-    printf("diopiAddScalar == \n");
     xdnn::Context* ctx_xpu = impl::kunlunxin::set_cur_ctx(ctx);
     xdnn_pytorch::Tensor _out = impl::kunlunxin::build_xtorch_tensor(out);
     xdnn_pytorch::Tensor _input = impl::kunlunxin::build_xtorch_tensor(input);
@@ -200,15 +199,26 @@ DIOPI_API diopiError_t diopiDiv(diopiContextHandle_t ctx, diopiTensorHandle_t ou
     xdnn_pytorch::Tensor _out = impl::kunlunxin::build_xtorch_tensor(out);
     xdnn_pytorch::Tensor _input = impl::kunlunxin::build_xtorch_tensor(input);
     xdnn_pytorch::Tensor _other = impl::kunlunxin::build_xtorch_tensor(other);
-    // std::string mode = rounding_mode == RoundModeFloor ? "floor" : rounding_mode == RoundModeTrunc ? "trunc" : "";
-    // if (mode == "") {
-    //     DIOPI_CALL_XDNN(xdnn_pytorch::div_tensor_mode(ctx_xpu, _input, _other, xdnn_pytorch::optional<xdnn_pytorch::StringView>(), _out))
-    // } else {
-    //     DIOPI_CALL_XDNN(xdnn_pytorch::div_tensor_mode(ctx_xpu, _input, _other, xdnn_pytorch::optional<xdnn_pytorch::StringView>({mode.c_str()}), _out))
-    // }
+    std::string mode = rounding_mode == RoundModeFloor ? "floor" : rounding_mode == RoundModeTrunc ? "trunc" : "";
+    if (mode == "") {
+        DIOPI_CALL_XDNN(xdnn_pytorch::div_tensor_mode(ctx_xpu, _input, _other, xdnn_pytorch::optional<xdnn_pytorch::StringView>(), _out))
+    } else {
+        DIOPI_CALL_XDNN(xdnn_pytorch::div_tensor_mode(ctx_xpu, _input, _other, xdnn_pytorch::optional<xdnn_pytorch::StringView>({mode.c_str()}), _out))
+    }
     DIOPI_CALL_XDNN(xdnn_pytorch::div_tensor(ctx_xpu, _input, _other, _out))
     return diopiSuccess;
 }
+
+DIOPI_API diopiError_t diopiDivScalar(diopiContextHandle_t ctx, diopiTensorHandle_t out, diopiConstTensorHandle_t input, const diopiScalar_t *other,
+                                      diopiRoundMode_t rounding_mode) {
+    xdnn::Context* ctx_xpu = impl::kunlunxin::set_cur_ctx(ctx);
+    xdnn_pytorch::Tensor _out = impl::kunlunxin::build_xtorch_tensor(out);
+    xdnn_pytorch::Tensor _input = impl::kunlunxin::build_xtorch_tensor(input);
+    xdnn_pytorch::Scalar _other = impl::kunlunxin::build_xtorch_scalar(other);
+    DIOPI_CALL_XDNN(xdnn_pytorch::div_scalar(ctx_xpu, _input, _other, _out))
+    return diopiSuccess;
+}
+
 DIOPI_API diopiError_t diopiBatchNormBackward(diopiContextHandle_t ctx, diopiTensorHandle_t grad_input, diopiTensorHandle_t grad_weight,
                                               diopiTensorHandle_t grad_bias, diopiConstTensorHandle_t grad_output, diopiConstTensorHandle_t input,
                                               diopiConstTensorHandle_t weight, diopiConstTensorHandle_t running_mean, diopiConstTensorHandle_t running_var,
@@ -423,9 +433,11 @@ DIOPI_API diopiError_t diopiMean(diopiContextHandle_t ctx, diopiTensorHandle_t o
     // xdnn_pytorch::ScalarType _dtype = impl::kunlunxin::get_xtorch_type(dtype);
     xdnn_pytorch::ScalarType _dtype = xdnn_pytorch::ScalarType::kfloat32;
     if (dim.len == 0) {
+        //std::cout << "cyliu diopiMean: dim.len == 0" << std::endl;
         xdnn_pytorch::Tensor _inputTemp = impl::kunlunxin::build_xtorch_tensor(input);
         DIOPI_CALL_XDNN(xdnn_pytorch::mean(ctx_xpu, _input, _dtype, _inputTemp));
     } else {
+        //std::cout << "cyliu diopiMean: dim.len = " << dim.len << std::endl;
         xtorch_vec _dim = impl::kunlunxin::build_xtorch_vec(dim);
         DIOPI_CALL_XDNN(xdnn_pytorch::mean_dim(ctx_xpu, _input, _dim, false, _dtype, _out));
     }
